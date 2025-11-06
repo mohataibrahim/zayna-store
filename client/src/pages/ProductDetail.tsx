@@ -1,11 +1,10 @@
 import { useParams, useLocation } from 'wouter';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCountry } from '@/contexts/CountryContext';
 import Header from '@/components/Header';
-import { Product } from '@/lib/types';
-import { getProducts } from '@/lib/utils';
+import { trpc } from '@/lib/trpc';
 import { Copy } from 'lucide-react';
 
 export default function ProductDetail() {
@@ -13,22 +12,19 @@ export default function ProductDetail() {
   const [, navigate] = useLocation();
   const { t } = useLanguage();
   const { currency, convertPrice, getCurrencySymbol, getCountryName } = useCountry();
-  const [product, setProduct] = useState<Product | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [copied, setCopied] = useState(false);
 
-  useEffect(() => {
-    const products = getProducts();
-    const found = products.find((p: Product) => p.id === id);
-    if (found) {
-      setProduct(found);
-    } else {
-      navigate('/404');
-    }
-  }, [id, navigate]);
+  // Fetch product from API
+  const productId = parseInt(id || '0', 10);
+  const { data: product, isLoading } = trpc.products.get.useQuery({ id: productId });
+
+  if (isLoading) {
+    return <div className="min-h-screen bg-background text-foreground flex items-center justify-center">{t('loading')}</div>;
+  }
 
   if (!product) {
-    return <div className="min-h-screen bg-background text-foreground flex items-center justify-center">{t('loading')}</div>;
+    return <div className="min-h-screen bg-background text-foreground flex items-center justify-center">Product not found</div>;
   }
 
   const convertedPrice = convertPrice(parseFloat(product.price));

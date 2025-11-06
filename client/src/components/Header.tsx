@@ -5,7 +5,7 @@ import { useCountry, getCountries } from '@/contexts/CountryContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { Button } from '@/components/ui/button';
 import { Search, Moon, Sun } from 'lucide-react';
-import { getProducts } from '@/lib/utils';
+import { trpc } from '@/lib/trpc';
 
 export default function Header() {
   const [, navigate] = useLocation();
@@ -13,6 +13,9 @@ export default function Header() {
   const { country, setCountry } = useCountry();
   const { theme, toggleTheme } = useTheme();
   const [searchInput, setSearchInput] = useState('');
+
+  // Fetch products for search
+  const { data: allProducts = [] } = trpc.products.list.useQuery();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,8 +28,7 @@ export default function Header() {
     }
     
     // Search by product ID
-    const products = getProducts();
-    const foundProduct = products.find(p => p.productId.toLowerCase() === searchInput.toUpperCase());
+    const foundProduct = allProducts.find(p => p.productId.toLowerCase() === searchInput.toUpperCase());
     
     if (foundProduct) {
       navigate(`/product/${foundProduct.id}`);

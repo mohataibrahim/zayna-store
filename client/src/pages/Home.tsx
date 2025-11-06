@@ -4,15 +4,17 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useCountry } from '@/contexts/CountryContext';
 import Header from '@/components/Header';
 import ProductCard from '@/components/ProductCard';
-import { getProducts } from '@/lib/utils';
+import { trpc } from '@/lib/trpc';
 import { Product } from '@/lib/types';
 
 export default function Home() {
   const [, navigate] = useLocation();
   const { t } = useLanguage();
   const { country, getCountryName } = useCountry();
-  const [products, setProducts] = useState<Product[]>([]);
   const [showSplash, setShowSplash] = useState(true);
+
+  // Fetch products from API
+  const { data: allProducts = [], isLoading } = trpc.products.list.useQuery();
 
   useEffect(() => {
     // Show splash screen for 2 seconds
@@ -23,12 +25,8 @@ export default function Home() {
     return () => clearTimeout(timer);
   }, []);
 
-  useEffect(() => {
-    const allProducts = getProducts();
-    // Filter products by selected country
-    const filteredProducts = allProducts.filter(p => p.country === country);
-    setProducts(filteredProducts);
-  }, [country]);
+  // Filter products by selected country
+  const products = allProducts.filter((p: Product) => p.country === country);
 
   if (showSplash) {
     return (
@@ -61,7 +59,11 @@ export default function Home() {
         </div>
 
         {/* Products Grid */}
-        {products.length === 0 ? (
+        {isLoading ? (
+          <div className="text-center py-12">
+            <p className="text-foreground/60">{t('loading')}</p>
+          </div>
+        ) : products.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-xl text-foreground/60 mb-6">
               {t('language') === 'ar' ? 'لا توجد منتجات في هذه الدولة حالياً' : 'No products available in this country yet'}
@@ -74,7 +76,7 @@ export default function Home() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {products.map((product, index) => (
+            {products.map((product: Product, index: number) => (
               <div
                 key={product.id}
                 style={{

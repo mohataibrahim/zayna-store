@@ -1,15 +1,16 @@
 import { Country } from '@/contexts/CountryContext';
 
 export interface Product {
-  id: string;
+  id: number;
   productId: string;
   name: string;
   price: string;
   description: string;
   image: string;
-  video?: string;
+  video: string | null;
   country: Country;
-  createdAt?: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export type Currency = 'SAR' | 'EGP' | 'AED' | 'IQD';

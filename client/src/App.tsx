@@ -11,6 +11,7 @@ import { LanguageProvider } from "./contexts/LanguageContext";
 import { CountryProvider } from "./contexts/CountryContext";
 
 function Router() {
+  // make sure to consider if you need authentication for certain routes
   return (
     <Switch>
       <Route path={"/"} component={Home} />

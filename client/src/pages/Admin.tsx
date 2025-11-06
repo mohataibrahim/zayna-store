@@ -1,10 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCountry, getCountries } from '@/contexts/CountryContext';
 import Header from '@/components/Header';
-import { getProducts, addProduct, deleteProduct } from '@/lib/utils';
+import { trpc } from '@/lib/trpc';
 import { Product } from '@/lib/types';
 import { Trash2, Plus, Copy } from 'lucide-react';
 import { Country } from '@/contexts/CountryContext';
@@ -13,7 +13,6 @@ export default function Admin() {
   const [, navigate] = useLocation();
   const { t, language } = useLanguage();
   const { country: selectedCountry } = useCountry();
-  const [products, setProducts] = useState<Product[]>([]);
   const [formData, setFormData] = useState({
     name: '',
     price: '',
@@ -25,13 +24,10 @@ export default function Admin() {
   const [imagePreview, setImagePreview] = useState('');
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
-  useEffect(() => {
-    setProducts(getProducts());
-  }, []);
-
-  useEffect(() => {
-    setFormData(prev => ({ ...prev, country: selectedCountry }));
-  }, [selectedCountry]);
+  // Fetch products from API
+  const { data: allProducts = [], refetch } = trpc.products.list.useQuery();
+  const createProductMutation = trpc.products.create.useMutation();
+  const deleteProductMutation = trpc.products.delete.useMutation();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -51,7 +47,16 @@ export default function Admin() {
     }
   };
 
-  const handleAddProduct = (e: React.FormEvent) => {
+  const generateProductId = (): string => {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let result = 'ZYNA';
+    for (let i = 0; i < 6; i++) {
+      result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return result;
+  };
+
+  const handleAddProduct = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!formData.name || !formData.price || !formData.description || !formData.image || !formData.country) {
@@ -59,33 +64,44 @@ export default function Admin() {
       return;
     }
 
-    const newProduct = addProduct({
-      name: formData.name,
-      price: formData.price,
-      description: formData.description,
-      image: formData.image,
-      video: formData.video || undefined,
-      country: formData.country as Country,
-    });
+    try {
+      await createProductMutation.mutateAsync({
+        productId: generateProductId(),
+        name: formData.name,
+        price: formData.price,
+        description: formData.description,
+        image: formData.image,
+        video: formData.video || undefined,
+        country: formData.country as 'SA' | 'EG' | 'AE' | 'IQ',
+      });
 
-    setProducts(prev => [...prev, newProduct]);
-    setFormData({ 
-      name: '', 
-      price: '', 
-      description: '', 
-      image: '', 
-      video: '',
-      country: selectedCountry,
-    });
-    setImagePreview('');
-    
-    alert(language === 'ar' ? 'تم إضافة المنتج بنجاح' : 'Product added successfully');
+      setFormData({ 
+        name: '', 
+        price: '', 
+        description: '', 
+        image: '', 
+        video: '',
+        country: selectedCountry,
+      });
+      setImagePreview('');
+      
+      alert(language === 'ar' ? 'تم إضافة المنتج بنجاح' : 'Product added successfully');
+      refetch();
+    } catch (error) {
+      alert(language === 'ar' ? 'حدث خطأ في إضافة المنتج' : 'Error adding product');
+      console.error(error);
+    }
   };
 
-  const handleDeleteProduct = (id: string) => {
+  const handleDeleteProduct = async (id: number) => {
     if (confirm(language === 'ar' ? 'هل تريد حذف هذا المنتج؟' : 'Are you sure you want to delete this product?')) {
-      deleteProduct(id);
-      setProducts(prev => prev.filter(p => p.id !== id));
+      try {
+        await deleteProductMutation.mutateAsync({ id });
+        refetch();
+      } catch (error) {
+        alert(language === 'ar' ? 'حدث خطأ في حذف المنتج' : 'Error deleting product');
+        console.error(error);
+      }
     }
   };
 
@@ -96,7 +112,7 @@ export default function Admin() {
   };
 
   const countries = getCountries();
-  const filteredProducts = products.filter(p => p.country === selectedCountry);
+  const filteredProducts = allProducts.filter((p: Product) => p.country === selectedCountry);
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -214,10 +230,11 @@ export default function Admin() {
 
             <Button
               type="submit"
+              disabled={createProductMutation.isPending}
               className="btn-gold-invert py-3 text-lg font-semibold w-full"
             >
               <Plus size={20} className="mr-2" />
-              {t('add_product')}
+              {createProductMutation.isPending ? 'جاري الإضافة...' : t('add_product')}
             </Button>
           </form>
         </div>
@@ -235,7 +252,7 @@ export default function Admin() {
             </p>
           ) : (
             <div className="space-y-4">
-              {filteredProducts.map(product => (
+              {filteredProducts.map((product: Product) => (
                 <div
                   key={product.id}
                   className="flex items-center justify-between gap-4 p-4 bg-background border border-border rounded-lg flex-wrap"
@@ -269,6 +286,7 @@ export default function Admin() {
                   </div>
                   <Button
                     onClick={() => handleDeleteProduct(product.id)}
+                    disabled={deleteProductMutation.isPending}
                     variant="destructive"
                     size="sm"
                     className="flex-shrink-0"
