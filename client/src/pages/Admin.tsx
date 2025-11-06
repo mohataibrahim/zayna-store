@@ -37,6 +37,10 @@ export default function Admin() {
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        alert(language === 'ar' ? 'حجم الصورة كبير جداً' : 'Image is too large');
+        return;
+      }
       const reader = new FileReader();
       reader.onloadend = () => {
         const dataUrl = reader.result as string;

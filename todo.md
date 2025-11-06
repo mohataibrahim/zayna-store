@@ -115,3 +115,20 @@
 - [x] Update frontend to use API instead of localStorage
 - [x] Test data persistence across browsers and devices
 - [x] Verify all users see the same products
+
+
+## Phase 15: File-Based Storage System (products.json)
+- [x] Create products.json file structure
+- [x] Create public/products/ directory for images
+- [x] Update API to read/write from products.json
+- [x] Add file upload handling for product images
+- [x] Update admin panel for new storage system
+- [x] Test product creation and retrieval
+- [x] Verify image uploads work correctly
+
+## Phase 16: Deployment to Vercel
+- [ ] Push code to GitHub
+- [ ] Connect GitHub to Vercel
+- [ ] Deploy to Vercel
+- [ ] Test all features on production
+- [ ] Configure custom domain (optional)
