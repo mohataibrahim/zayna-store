@@ -1,0 +1,58 @@
+# ZAYNA Store - Project TODO
+
+## Phase 1: Setup & Infrastructure
+- [x] Initialize project with static frontend template
+- [x] Copy ZAYNA logo to public assets
+- [x] Configure global styles (dark/gold theme)
+- [x] Add Arabic and English fonts (Noto Kufi Arabic, Playfair Display)
+- [x] Set up language context and i18n utilities
+
+## Phase 2: Homepage & Product Grid
+- [x] Create Header component with logo, language toggle, and search
+- [x] Create ProductCard component with hover effects
+- [x] Implement product grid layout
+- [x] Add fade-in animation on scroll
+- [x] Set up product data structure (JSON/localStorage)
+- [x] Display products from data source
+
+## Phase 3: Product Detail Page
+- [x] Create ProductDetail page component
+- [x] Display product image (large)
+- [x] Add video player for product videos
+- [x] Show product name, description, price
+- [x] Add quantity selector
+- [x] Implement WhatsApp purchase button with message template
+- [x] Add multi-currency support (SAR, EGP, AED)
+
+## Phase 4: Admin Panel
+- [x] Create hidden admin page (trigger with "adminZAYNA" search code)
+- [x] Build product form (name, price, description, image upload)
+- [x] Implement image upload to localStorage/public folder
+- [x] Add video URL input field
+- [x] Create "Add Product" functionality
+- [x] Update products.json or localStorage on submit
+- [x] Verify new products appear on homepage
+
+## Phase 5: Multi-Currency Support
+- [x] Add currency selector in header
+- [x] Implement currency conversion logic
+- [x] Display prices in selected currency (SAR, EGP, AED)
+- [x] Save currency preference to localStorage
+
+## Phase 6: Polish & Optimization
+- [x] Add loading splash screen with ZAYNA logo
+- [x] Implement smooth transitions and animations
+- [x] Add hover effects (gold shadow, color inversion on buttons)
+- [x] Ensure RTL/LTR support for both languages
+- [x] Test responsive design (mobile, tablet, desktop)
+- [x] Optimize images and performance
+- [x] Test WhatsApp integration across devices
+
+## Phase 7: Testing & Deployment
+- [x] Test all features in browser
+- [x] Verify language switching works correctly
+- [x] Test product CRUD operations
+- [x] Verify WhatsApp message generation
+- [x] Test on mobile devices
+- [ ] Create checkpoint
+- [ ] Deploy to production
