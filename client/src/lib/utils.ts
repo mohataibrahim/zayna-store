@@ -9,10 +9,21 @@ import { Product, Currency } from './types';
 
 const PRODUCTS_STORAGE_KEY = 'zayna_products';
 
+// Generate unique product ID
+function generateProductId(): string {
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let result = 'ZYN';
+  for (let i = 0; i < 6; i++) {
+    result += characters.charAt(Math.floor(Math.random() * characters.length));
+  }
+  return result;
+}
+
 // Default products
 const DEFAULT_PRODUCTS: Product[] = [
   {
     id: '1',
+    productId: 'ZYNA001',
     name: 'ساعة فاخرة',
     price: '350',
     description: 'ساعة أنيقة بتصميم ذهبي فاخر مع حزام جلدي أصلي',
@@ -22,6 +33,7 @@ const DEFAULT_PRODUCTS: Product[] = [
   },
   {
     id: '2',
+    productId: 'ZYNA002',
     name: 'عقد ذهبي',
     price: '450',
     description: 'عقد ذهبي عيار 18 بتصميم حديث وأنيق',
@@ -30,6 +42,7 @@ const DEFAULT_PRODUCTS: Product[] = [
   },
   {
     id: '3',
+    productId: 'ZYNA003',
     name: 'خاتم الماس',
     price: '800',
     description: 'خاتم فاخر مرصع بحجر الماس الطبيعي',
@@ -58,11 +71,12 @@ export function saveProducts(products: Product[]): void {
   }
 }
 
-export function addProduct(product: Omit<Product, 'id' | 'createdAt'>): Product {
+export function addProduct(product: Omit<Product, 'id' | 'productId' | 'createdAt'>): Product {
   const products = getProducts();
   const newProduct: Product = {
     ...product,
     id: Date.now().toString(),
+    productId: generateProductId(),
     createdAt: new Date().toISOString(),
   };
   products.push(newProduct);

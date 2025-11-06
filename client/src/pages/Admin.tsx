@@ -6,7 +6,7 @@ import { useCountry, getCountries } from '@/contexts/CountryContext';
 import Header from '@/components/Header';
 import { getProducts, addProduct, deleteProduct } from '@/lib/utils';
 import { Product } from '@/lib/types';
-import { Trash2, Plus } from 'lucide-react';
+import { Trash2, Plus, Copy } from 'lucide-react';
 import { Country } from '@/contexts/CountryContext';
 
 export default function Admin() {
@@ -23,6 +23,7 @@ export default function Admin() {
     country: selectedCountry as Country,
   });
   const [imagePreview, setImagePreview] = useState('');
+  const [copiedId, setCopiedId] = useState<string | null>(null);
 
   useEffect(() => {
     setProducts(getProducts());
@@ -86,6 +87,12 @@ export default function Admin() {
       deleteProduct(id);
       setProducts(prev => prev.filter(p => p.id !== id));
     }
+  };
+
+  const handleCopyProductId = (productId: string) => {
+    navigator.clipboard.writeText(productId);
+    setCopiedId(productId);
+    setTimeout(() => setCopiedId(null), 2000);
   };
 
   const countries = getCountries();
@@ -231,24 +238,40 @@ export default function Admin() {
               {filteredProducts.map(product => (
                 <div
                   key={product.id}
-                  className="flex items-center justify-between gap-4 p-4 bg-background border border-border rounded-lg"
+                  className="flex items-center justify-between gap-4 p-4 bg-background border border-border rounded-lg flex-wrap"
                 >
-                  <div className="flex items-center gap-4 flex-1">
+                  <div className="flex items-center gap-4 flex-1 min-w-0">
                     <img
                       src={product.image}
                       alt={product.name}
-                      className="w-16 h-16 object-cover rounded"
+                      className="w-16 h-16 object-cover rounded flex-shrink-0"
                     />
-                    <div className="flex-1">
+                    <div className="flex-1 min-w-0">
                       <h3 className="font-bold text-foreground">{product.name}</h3>
                       <p className="text-sm text-foreground/60">{product.price} SAR</p>
-                      <p className="text-sm text-foreground/60 line-clamp-1">{product.description}</p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <p className="text-sm font-semibold text-accent">{product.productId}</p>
+                        <button
+                          onClick={() => handleCopyProductId(product.productId)}
+                          className="text-accent hover:text-accent/80 transition-colors"
+                          title={language === 'ar' ? 'نسخ المعرف' : 'Copy ID'}
+                        >
+                          <Copy size={14} />
+                        </button>
+                        {copiedId === product.productId && (
+                          <span className="text-xs text-green-500">
+                            {language === 'ar' ? 'تم النسخ' : 'Copied'}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-xs text-foreground/40 line-clamp-1 mt-1">{product.description}</p>
                     </div>
                   </div>
                   <Button
                     onClick={() => handleDeleteProduct(product.id)}
                     variant="destructive"
                     size="sm"
+                    className="flex-shrink-0"
                   >
                     <Trash2 size={16} />
                   </Button>

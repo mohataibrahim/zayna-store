@@ -5,6 +5,7 @@ import { useCountry, getCountries } from '@/contexts/CountryContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { Button } from '@/components/ui/button';
 import { Search, Moon, Sun } from 'lucide-react';
+import { getProducts } from '@/lib/utils';
 
 export default function Header() {
   const [, navigate] = useLocation();
@@ -23,8 +24,17 @@ export default function Header() {
       return;
     }
     
-    // Regular search functionality can be added here
-    setSearchInput('');
+    // Search by product ID
+    const products = getProducts();
+    const foundProduct = products.find(p => p.productId.toLowerCase() === searchInput.toUpperCase());
+    
+    if (foundProduct) {
+      navigate(`/product/${foundProduct.id}`);
+      setSearchInput('');
+    } else {
+      alert(language === 'ar' ? 'لم يتم العثور على المنتج' : 'Product not found');
+      setSearchInput('');
+    }
   };
 
   const countries = getCountries();
@@ -56,7 +66,7 @@ export default function Header() {
             <div className="relative">
               <input
                 type="text"
-                placeholder={language === 'ar' ? 'بحث' : 'Search'}
+                placeholder={language === 'ar' ? 'ابحث بمعرف المنتج' : 'Search by Product ID'}
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
                 className="w-full px-4 py-2 bg-background text-foreground border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"

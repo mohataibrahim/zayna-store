@@ -6,6 +6,7 @@ import { useCountry } from '@/contexts/CountryContext';
 import Header from '@/components/Header';
 import { Product } from '@/lib/types';
 import { getProducts } from '@/lib/utils';
+import { Copy } from 'lucide-react';
 
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
@@ -14,6 +15,7 @@ export default function ProductDetail() {
   const { currency, convertPrice, getCurrencySymbol, getCountryName } = useCountry();
   const [product, setProduct] = useState<Product | null>(null);
   const [quantity, setQuantity] = useState(1);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     const products = getProducts();
@@ -33,11 +35,16 @@ export default function ProductDetail() {
   const currencySymbol = getCurrencySymbol(true);
 
   const handleWhatsAppPurchase = () => {
-    const message = `مرحبًا، أود شراء هذا المنتج من متجر ZAYNA:\n\n📦 الاسم: ${product.name}\n💰 السعر: ${convertedPrice} ${currencySymbol}\n🔢 الكمية: ${quantity}\n🖼️ صورة المنتج: ${window.location.origin}${product.image}\n📝 الوصف: ${product.description}`;
-    
+    const message = `السلام عليكم\n${product.productId}`;
     const encodedMessage = encodeURIComponent(message);
     const whatsappUrl = `https://wa.me/212721199652?text=${encodedMessage}`;
     window.open(whatsappUrl, '_blank');
+  };
+
+  const handleCopyProductId = () => {
+    navigator.clipboard.writeText(product.productId);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   return (
@@ -71,6 +78,29 @@ export default function ProductDetail() {
               <p className="text-sm text-foreground/60 mt-2">
                 {getCountryName(true)}
               </p>
+            </div>
+
+            {/* Product ID */}
+            <div className="bg-card border border-border rounded-lg p-4">
+              <p className="text-sm text-foreground/60 mb-2">
+                {t('language') === 'ar' ? 'معرف المنتج' : 'Product ID'}
+              </p>
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-2xl font-bold text-accent">{product.productId}</span>
+                <Button
+                  onClick={handleCopyProductId}
+                  variant="outline"
+                  size="sm"
+                  className="text-accent border-accent hover:bg-accent hover:text-accent-foreground"
+                >
+                  <Copy size={16} />
+                </Button>
+              </div>
+              {copied && (
+                <p className="text-sm text-green-500 mt-2">
+                  {t('language') === 'ar' ? 'تم النسخ!' : 'Copied!'}
+                </p>
+              )}
             </div>
 
             <p className="text-lg text-foreground/80">{product.description}</p>

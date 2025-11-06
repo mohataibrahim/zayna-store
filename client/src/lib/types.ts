@@ -2,6 +2,7 @@ import { Country } from '@/contexts/CountryContext';
 
 export interface Product {
   id: string;
+  productId: string;
   name: string;
   price: string;
   description: string;
