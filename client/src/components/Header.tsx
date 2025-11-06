@@ -1,12 +1,16 @@
 import { useState } from 'react';
 import { useLocation } from 'wouter';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useCountry, getCountries } from '@/contexts/CountryContext';
+import { useTheme } from '@/contexts/ThemeContext';
 import { Button } from '@/components/ui/button';
-import { Search } from 'lucide-react';
+import { Search, Moon, Sun } from 'lucide-react';
 
 export default function Header() {
   const [, navigate] = useLocation();
-  const { language, setLanguage, t, isRTL } = useLanguage();
+  const { language, setLanguage, isRTL } = useLanguage();
+  const { country, setCountry } = useCountry();
+  const { theme, toggleTheme } = useTheme();
   const [searchInput, setSearchInput] = useState('');
 
   const handleSearch = (e: React.FormEvent) => {
@@ -23,10 +27,12 @@ export default function Header() {
     setSearchInput('');
   };
 
+  const countries = getCountries();
+
   return (
     <header className="sticky top-0 z-50 bg-card border-b border-border">
       <div className="container py-4">
-        <div className="flex items-center justify-between gap-4">
+        <div className="flex items-center justify-between gap-4 flex-wrap">
           {/* Logo */}
           <button
             onClick={() => navigate('/')}
@@ -39,7 +45,9 @@ export default function Header() {
             />
             <div className="hidden sm:flex flex-col">
               <span className="text-lg font-bold text-accent">ZAYNA</span>
-              <span className="text-xs text-foreground/60">{t('luxury_store')}</span>
+              <span className="text-xs text-foreground/60">
+                {language === 'ar' ? 'متجر فاخر' : 'Luxury Store'}
+              </span>
             </div>
           </button>
 
@@ -48,7 +56,7 @@ export default function Header() {
             <div className="relative">
               <input
                 type="text"
-                placeholder={t('search')}
+                placeholder={language === 'ar' ? 'بحث' : 'Search'}
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
                 className="w-full px-4 py-2 bg-background text-foreground border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
@@ -62,14 +70,42 @@ export default function Header() {
             </div>
           </form>
 
-          {/* Language Toggle */}
-          <Button
-            onClick={() => setLanguage(language === 'ar' ? 'en' : 'ar')}
-            variant="outline"
-            className="text-accent border-accent hover:bg-accent hover:text-accent-foreground"
-          >
-            {language === 'ar' ? 'EN' : 'AR'}
-          </Button>
+          {/* Controls */}
+          <div className="flex items-center gap-2 flex-wrap justify-end">
+            {/* Country Selector */}
+            <select
+              value={country}
+              onChange={(e) => setCountry(e.target.value as any)}
+              className="px-3 py-2 bg-background text-foreground border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent"
+            >
+              {countries.map(c => (
+                <option key={c.code} value={c.code}>
+                  {language === 'ar' ? c.nameAr : c.name}
+                </option>
+              ))}
+            </select>
+
+            {/* Theme Toggle */}
+            <Button
+              onClick={toggleTheme}
+              variant="outline"
+              size="sm"
+              className="text-accent border-accent hover:bg-accent hover:text-accent-foreground"
+              title={language === 'ar' ? 'تبديل الوضع' : 'Toggle theme'}
+            >
+              {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+            </Button>
+
+            {/* Language Toggle */}
+            <Button
+              onClick={() => setLanguage(language === 'ar' ? 'en' : 'ar')}
+              variant="outline"
+              size="sm"
+              className="text-accent border-accent hover:bg-accent hover:text-accent-foreground"
+            >
+              {language === 'ar' ? 'EN' : 'AR'}
+            </Button>
+          </div>
         </div>
       </div>
     </header>

@@ -1,3 +1,5 @@
+import { Country } from '@/contexts/CountryContext';
+
 export interface Product {
   id: string;
   name: string;
@@ -5,7 +7,8 @@ export interface Product {
   description: string;
   image: string;
   video?: string;
+  country: Country;
   createdAt?: string;
 }
 
-export type Currency = 'SAR' | 'EGP' | 'AED';
+export type Currency = 'SAR' | 'EGP' | 'AED' | 'IQD';

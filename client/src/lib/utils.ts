@@ -18,6 +18,7 @@ const DEFAULT_PRODUCTS: Product[] = [
     description: 'ساعة أنيقة بتصميم ذهبي فاخر مع حزام جلدي أصلي',
     image: '/placeholder-watch.jpg',
     video: 'https://example.com/watch.mp4',
+    country: 'SA',
   },
   {
     id: '2',
@@ -25,6 +26,7 @@ const DEFAULT_PRODUCTS: Product[] = [
     price: '450',
     description: 'عقد ذهبي عيار 18 بتصميم حديث وأنيق',
     image: '/placeholder-necklace.jpg',
+    country: 'EG',
   },
   {
     id: '3',
@@ -32,6 +34,7 @@ const DEFAULT_PRODUCTS: Product[] = [
     price: '800',
     description: 'خاتم فاخر مرصع بحجر الماس الطبيعي',
     image: '/placeholder-ring.jpg',
+    country: 'AE',
   },
 ];
 
@@ -87,6 +90,7 @@ const CONVERSION_RATES: Record<Currency, number> = {
   SAR: 1,      // Base currency
   EGP: 13.5,   // 1 SAR ≈ 13.5 EGP
   AED: 1.37,   // 1 SAR ≈ 1.37 AED
+  IQD: 525,    // 1 SAR ≈ 525 IQD
 };
 
 export function convertPrice(priceInSAR: number, toCurrency: Currency): string {
@@ -100,6 +104,7 @@ export function getCurrencySymbol(currency: Currency): string {
     SAR: 'ر.س',
     EGP: 'ج.م',
     AED: 'د.إ',
+    IQD: 'ع.د',
   };
   return symbols[currency];
 }
@@ -109,6 +114,7 @@ export function getCurrencyName(currency: Currency): string {
     SAR: 'Saudi Riyal',
     EGP: 'Egyptian Pound',
     AED: 'UAE Dirham',
+    IQD: 'Iraqi Dinar',
   };
   return names[currency];
 }

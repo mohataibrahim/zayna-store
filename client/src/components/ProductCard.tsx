@@ -1,9 +1,7 @@
-import { Product, Currency } from '@/lib/types';
+import { Product } from '@/lib/types';
 import { Button } from '@/components/ui/button';
-import { useLanguage } from '@/contexts/LanguageContext';
-import { convertPrice, getCurrencySymbol } from '@/lib/utils';
+import { useCountry } from '@/contexts/CountryContext';
 import { ChevronRight } from 'lucide-react';
-import { useState } from 'react';
 
 interface ProductCardProps {
   product: Product;
@@ -11,13 +9,10 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product, onClick }: ProductCardProps) {
-  const { t } = useLanguage();
-  const [currency, setCurrency] = useState<Currency>(() => {
-    return (localStorage.getItem('currency') as Currency) || 'SAR';
-  });
+  const { convertPrice, getCurrencySymbol } = useCountry();
 
-  const convertedPrice = convertPrice(parseFloat(product.price), currency);
-  const currencySymbol = getCurrencySymbol(currency);
+  const convertedPrice = convertPrice(parseFloat(product.price));
+  const currencySymbol = getCurrencySymbol(true);
 
   return (
     <div className="product-card bg-card border border-border rounded-lg overflow-hidden hover:border-accent transition-all duration-300">
@@ -47,19 +42,6 @@ export default function ProductCard({ product, onClick }: ProductCardProps) {
           <span className="text-2xl font-bold text-accent">
             {convertedPrice} {currencySymbol}
           </span>
-          <select
-            value={currency}
-            onChange={(e) => {
-              const newCurrency = e.target.value as Currency;
-              setCurrency(newCurrency);
-              localStorage.setItem('currency', newCurrency);
-            }}
-            className="text-xs bg-background text-foreground border border-border rounded px-2 py-1"
-          >
-            <option value="SAR">SAR</option>
-            <option value="EGP">EGP</option>
-            <option value="AED">AED</option>
-          </select>
         </div>
 
         {/* View Details Button */}
@@ -67,7 +49,7 @@ export default function ProductCard({ product, onClick }: ProductCardProps) {
           onClick={onClick}
           className="btn-gold-invert w-full py-3 font-semibold flex items-center justify-center gap-2"
         >
-          {t('view_details')}
+          عرض التفاصيل
           <ChevronRight size={18} />
         </Button>
       </div>

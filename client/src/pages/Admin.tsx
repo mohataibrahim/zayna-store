@@ -2,14 +2,17 @@ import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useCountry, getCountries } from '@/contexts/CountryContext';
 import Header from '@/components/Header';
-import { getProducts, addProduct, deleteProduct, saveProducts } from '@/lib/utils';
+import { getProducts, addProduct, deleteProduct } from '@/lib/utils';
 import { Product } from '@/lib/types';
 import { Trash2, Plus } from 'lucide-react';
+import { Country } from '@/contexts/CountryContext';
 
 export default function Admin() {
   const [, navigate] = useLocation();
   const { t, language } = useLanguage();
+  const { country: selectedCountry } = useCountry();
   const [products, setProducts] = useState<Product[]>([]);
   const [formData, setFormData] = useState({
     name: '',
@@ -17,6 +20,7 @@ export default function Admin() {
     description: '',
     image: '',
     video: '',
+    country: selectedCountry as Country,
   });
   const [imagePreview, setImagePreview] = useState('');
 
@@ -24,7 +28,11 @@ export default function Admin() {
     setProducts(getProducts());
   }, []);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  useEffect(() => {
+    setFormData(prev => ({ ...prev, country: selectedCountry }));
+  }, [selectedCountry]);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
@@ -45,7 +53,7 @@ export default function Admin() {
   const handleAddProduct = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.name || !formData.price || !formData.description || !formData.image) {
+    if (!formData.name || !formData.price || !formData.description || !formData.image || !formData.country) {
       alert(language === 'ar' ? 'يرجى ملء جميع الحقول المطلوبة' : 'Please fill in all required fields');
       return;
     }
@@ -56,10 +64,18 @@ export default function Admin() {
       description: formData.description,
       image: formData.image,
       video: formData.video || undefined,
+      country: formData.country as Country,
     });
 
     setProducts(prev => [...prev, newProduct]);
-    setFormData({ name: '', price: '', description: '', image: '', video: '' });
+    setFormData({ 
+      name: '', 
+      price: '', 
+      description: '', 
+      image: '', 
+      video: '',
+      country: selectedCountry,
+    });
     setImagePreview('');
     
     alert(language === 'ar' ? 'تم إضافة المنتج بنجاح' : 'Product added successfully');
@@ -71,6 +87,9 @@ export default function Admin() {
       setProducts(prev => prev.filter(p => p.id !== id));
     }
   };
+
+  const countries = getCountries();
+  const filteredProducts = products.filter(p => p.country === selectedCountry);
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -112,6 +131,25 @@ export default function Admin() {
                   className="w-full px-4 py-2 bg-background text-foreground border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
                   placeholder="350"
                 />
+              </div>
+
+              {/* Country Selection */}
+              <div>
+                <label className="block text-foreground font-semibold mb-2">
+                  {language === 'ar' ? 'الدولة' : 'Country'} *
+                </label>
+                <select
+                  name="country"
+                  value={formData.country}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-2 bg-background text-foreground border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
+                >
+                  {countries.map(c => (
+                    <option key={c.code} value={c.code}>
+                      {language === 'ar' ? c.nameAr : c.name}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
 
@@ -180,16 +218,17 @@ export default function Admin() {
         {/* Products List */}
         <div className="bg-card border border-border rounded-lg p-8">
           <h2 className="text-2xl font-bold text-accent mb-6">
-            {language === 'ar' ? 'المنتجات الحالية' : 'Current Products'}
+            {language === 'ar' ? 'المنتجات في ' : 'Products in '}
+            {language === 'ar' ? getCountries().find(c => c.code === selectedCountry)?.nameAr : getCountries().find(c => c.code === selectedCountry)?.name}
           </h2>
           
-          {products.length === 0 ? (
+          {filteredProducts.length === 0 ? (
             <p className="text-foreground/60 text-center py-8">
-              {language === 'ar' ? 'لا توجد منتجات حالياً' : 'No products yet'}
+              {language === 'ar' ? 'لا توجد منتجات في هذه الدولة حالياً' : 'No products in this country yet'}
             </p>
           ) : (
             <div className="space-y-4">
-              {products.map(product => (
+              {filteredProducts.map(product => (
                 <div
                   key={product.id}
                   className="flex items-center justify-between gap-4 p-4 bg-background border border-border rounded-lg"

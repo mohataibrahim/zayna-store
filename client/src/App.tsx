@@ -8,6 +8,7 @@ import Home from "./pages/Home";
 import ProductDetail from "./pages/ProductDetail";
 import Admin from "./pages/Admin";
 import { LanguageProvider } from "./contexts/LanguageContext";
+import { CountryProvider } from "./contexts/CountryContext";
 
 function Router() {
   return (
@@ -30,12 +31,14 @@ function Router() {
 function App() {
   return (
     <ErrorBoundary>
-      <ThemeProvider defaultTheme="dark">
+      <ThemeProvider defaultTheme="light" switchable>
         <LanguageProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Router />
-          </TooltipProvider>
+          <CountryProvider>
+            <TooltipProvider>
+              <Toaster />
+              <Router />
+            </TooltipProvider>
+          </CountryProvider>
         </LanguageProvider>
       </ThemeProvider>
     </ErrorBoundary>

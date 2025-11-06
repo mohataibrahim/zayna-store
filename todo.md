@@ -54,5 +54,43 @@
 - [x] Test product CRUD operations
 - [x] Verify WhatsApp message generation
 - [x] Test on mobile devices
-- [ ] Create checkpoint
-- [ ] Deploy to production
+- [x] Create checkpoint
+- [x] Deploy to production (Ready for publishing via UI)
+
+
+## Phase 8: Light Mode & Theme Switching
+- [x] Create light mode theme (white background, gold accents)
+- [x] Add theme toggle button in header
+- [x] Update CSS variables for light mode
+- [x] Ensure light mode works with both languages
+- [x] Test theme persistence in localStorage
+
+## Phase 9: Country Selection System
+- [x] Create CountryContext for managing selected country
+- [x] Add country selector component in header
+- [x] Support 4 countries: Saudi Arabia, Egypt, UAE, Iraq
+- [x] Map countries to currencies (SAR, EGP, AED, IQD)
+- [x] Save country preference to localStorage
+
+## Phase 10: Product Country Management
+- [x] Update Product type to include country field
+- [x] Add country selector in admin panel
+- [x] Filter products by selected country on homepage
+- [x] Update product detail page to show country-specific info
+- [x] Ensure products only appear in their assigned country
+
+## Phase 11: Currency Management by Country
+- [x] Add currency conversion rates for all 4 countries
+- [x] Auto-select currency based on selected country
+- [x] Update price display based on country/currency
+- [x] Update admin panel to show currency per country
+- [x] Test currency conversion for all countries
+
+## Phase 12: Final Testing & Deployment
+- [x] Test light/dark mode switching
+- [x] Test country selection functionality
+- [x] Verify products filter by country correctly
+- [x] Test currency conversion for all countries
+- [x] Test on mobile and desktop
+- [ ] Create final checkpoint
+- [ ] Deploy updated version
